@@ -21,9 +21,8 @@ async function fetchData() {
 
   xhr.open("POST", "https://graphql.getmontecarlo.com/graphql");
   xhr.setRequestHeader("Content-Type", "application/json");
-//   xhr.withCredentials = true;
+  //   xhr.withCredentials = true;
 
   xhr.send(request);
-
 }
 fetchData();

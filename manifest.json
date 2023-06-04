@@ -4,6 +4,7 @@
   "description": "Monte Carlo Data DevTools",
   "version": "1.0",
   "author": "Monte Carlo Data Solutions Architects",
+  "devtools_page": "devtools/mcd-devtools.html",
   "action": {
     "default_popup": "popup/popup.html",
     "default_title": "monte carlo dev tools",
@@ -21,13 +22,5 @@
     ],
   "host_permissions": [
     "https://*.getmontecarlo.com/"
-  ],
-  "content_scripts": [
-    {
-      "js": ["scripts/content.js"],
-      "matches": [
-        "https://getmontecarlo.com/*"
-      ]
-    }
   ]
 }
