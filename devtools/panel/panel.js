@@ -1,28 +1,119 @@
-async function fetchData() {
-  var request = JSON.stringify({
-    query:
-      "query getUser {\n  getUser {\n    __typename\n    id # The ID of the object.\n    cognitoUserId\n    email\n    firstName\n    lastName\n    displayName # Text to use when displaying the user.\n    state\n    createdOn\n    isSso\n    ssoGroups # Groups provided by the IdP in the last login\n    ssoGroupsUpdatedAt # Last time the SSO groups where updated\n    tokenId # For role=service accounts, the associated API token ID\n    isDeleted\n    # notificationSettingsAdded # Creator of the notification\n    # notificationSettingsModified # User who last updated this notification\n    # userSettings # Associated user\n    # invitees\n    # warehouseDeletedBy\n    # monitorLabelsCreated # Monitor label creator\n    # eventmodelSet\n    # incidentReactionsCreated\n    # incidentReactionsModified\n    # userComments\n    # creator # Who added the monitor\n    # metricmonitoringmodelSet # Who was the last user to update the monitor\n    # combinedtablestatsmodelSet\n    # objectProperties # Who last updated the property\n    # catalogObjectMetadata # Who last updated the object\n    # resources # Who last updated the resource\n    # lineageBlockPatterns # Who last updated the regexp\n    # lineageReplRules # Who last updated the replacement rule\n    # monteCarloConfigTemplates\n    # domainCreatedBy\n    # slackCredentialsV2 # User that installed the Slack app\n    # customUsers # Who last updated the object\n    # unifiedUsers # Associated MC user\n    # lastUpdatedUnifiedUsers # Who last updated the object\n    # collectionPreferenceCreatedBy\n    # collectionPreferenceLastUpdatedBy\n    # collectionPreferenceDeletedBy\n    # ghInstallations # User that installed the Github app\n    # dataProductCreatedBy\n    # dataProductLastUpdatedBy\n    # dataProductDeletedBy\n    # account\n    role # User internal role. One of:  user, service, system. Check the user's groups for their authorization roles\n    # auth # User's aggregate authorization policy.\n  }\n}",
-  });
+import {
+  getActiveTabUrl,
+  generateCreateMaintenanceQuery,
+  generateUsersQuery,
+  generateTableQuery,
+  generateDeleteMaintenanceQuery,
+} from "../../utils/utils.js";
 
-  var xhr = new XMLHttpRequest();
+const apiUrl = "https://graphql.getmontecarlo.com/graphql";
 
-  xhr.addEventListener("readystatechange", function () {
-    if (this.readyState === 4) {
-      var { data } = JSON.parse(this.responseText);
-      console.log(data);
+let mcon = "";
+let fullTableName = "";
+let warehouseName = "";
+let warehouseUuid = "";
 
-      document.getElementById("fname").innerHTML = data.getUser.firstName;
-      document.getElementById("lname").innerHTML = data.getUser.lastName;
-      document.getElementById("email").innerHTML = data.getUser.email;
-      document.getElementById("state").innerHTML = data.getUser.state;
-      document.getElementById("createDate").innerHTML = data.getUser.createdOn;
-    }
-  });
-
-  xhr.open("POST", "https://graphql.getmontecarlo.com/graphql");
-  xhr.setRequestHeader("Content-Type", "application/json");
-  //   xhr.withCredentials = true;
-
-  xhr.send(request);
+async function sendRequest(query) {
+  let request = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: query,
+  };
+  let resp = await fetch(apiUrl, request);
+  return await resp.json();
 }
-fetchData();
+
+const onCreateMaintWindow = async (e) => {
+  e.preventDefault();
+  let startTime = `${document.getElementById("startTime").value}Z`;
+  let endTime = `${document.getElementById("endTime").value}Z`;
+
+  let queryVars = {
+    startTime: startTime,
+    endTime: endTime,
+    mcon: mcon,
+    dwid: warehouseUuid,
+  };
+
+  let query = generateCreateMaintenanceQuery(queryVars);
+  let { data } = await sendRequest(query);
+  let maintId = data.createOrUpdateDataMaintenanceEntry.entry.id;
+
+  document.getElementById(
+    "maint-id"
+  ).textContent = `Created maintenance window id ${maintId}`;
+  document.getElementById("create-maintenance-window").style.display = "none";
+  document.getElementById("create-maintenance-window-results").style.display =
+    "";
+};
+
+const onDeleteMaintWindow = async (e) => {
+  e.preventDefault();
+  let maintenanceWindowId = document.getElementById(
+    "maintenance-window-id"
+  ).value;
+
+  let queryVars = {
+    id: maintenanceWindowId,
+  };
+
+  let query = generateDeleteMaintenanceQuery(queryVars);
+  let { data } = await sendRequest(query);
+  console.log(data);
+
+  document.getElementById(
+    "deleted-maintenance-window-conf"
+  ).textContent = `Deleted maintenance window id ${maintenanceWindowId}`;
+  document.getElementById("delete-maintenance-window").style.display = "none";
+  document.getElementById("delete-maintenance-window-results").style.display =
+    "";
+};
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const activeTab = await getActiveTabUrl();
+  let tabInfo = activeTab.url.split("/")[4].split("++")[4];
+
+  mcon = activeTab.url.split("/")[4];
+  fullTableName = mcon.split("++")[4];
+
+  // get the warehouse info
+  let vars = {
+    mcon: mcon,
+  };
+  let query = generateTableQuery(vars);
+  let { data } = await sendRequest(query);
+  warehouseName = data.getTable.warehouse.name;
+  warehouseUuid = data.getTable.warehouse.uuid;
+
+  // update the warehouse name in the form
+  let warehouseNameInput = document.getElementById("warehouse-name");
+  warehouseNameInput.value = warehouseName;
+
+  // update the warehouse UUID in the form
+  let warehouseUuidInput = document.getElementById("warehouse-uuid");
+  warehouseUuidInput.value = warehouseUuid;
+
+  // update the MCON in the form
+  let mconinput = document.getElementById("mcon");
+  mconinput.value = mcon;
+
+  // update the table name in the form
+  let tablenameinput = document.getElementById("full-table-name");
+  tablenameinput.value = fullTableName;
+
+  // add event listener to create button
+  document
+    .getElementById("create-maintenance-window")
+    .addEventListener("submit", onCreateMaintWindow);
+
+  // add event listener to delete button
+  document
+    .getElementById("delete-maintenance-window")
+    .addEventListener("submit", onDeleteMaintWindow);
+});
+
+// chrome.devtools.network.onNavigated.addListener(() => {
+//   console.log("Inspected page reloaded");
+// });

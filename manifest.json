@@ -18,7 +18,8 @@
   },
   "permissions": [
     "scripting",
-    "activeTab"
+    "activeTab",
+    "tabs"
     ],
   "host_permissions": [
     "https://*.getmontecarlo.com/"
