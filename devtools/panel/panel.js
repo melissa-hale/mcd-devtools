@@ -12,6 +12,7 @@ let mcon = "";
 let fullTableName = "";
 let warehouseName = "";
 let warehouseUuid = "";
+let currentURL = "";
 
 async function sendRequest(query) {
   let request = {
@@ -71,9 +72,9 @@ const onDeleteMaintWindow = async (e) => {
     "";
 };
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", async (tabId, changeInfo, tab) => {
   const activeTab = await getActiveTabUrl();
-  let tabInfo = activeTab.url.split("/")[4].split("++")[4];
+  currentURL = activeTab.url;
 
   mcon = activeTab.url.split("/")[4];
   fullTableName = mcon.split("++")[4];
@@ -113,6 +114,51 @@ document.addEventListener("DOMContentLoaded", async () => {
     .getElementById("delete-maintenance-window")
     .addEventListener("submit", onDeleteMaintWindow);
 });
+
+//Update form on page change. 
+//Note: External Tables are not supported
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) =>{
+  const activeTab = await getActiveTabUrl();
+  if (currentURL == activeTab.url) return;  //Check for URL change
+  // TODO: JS string compare ignores parameters, replace ? with "" to fix
+  //This will ensure one execution per url change
+  console.log("currentURL: " + currentURL)
+  console.log("activeTab.url: " + activeTab.url)
+  if(!activeTab.url.includes("https://getmontecarlo.com/assets")) return;
+  currentURL = activeTab.url;  
+  console.log(activeTab)
+  let tabInfo = activeTab.url.split("/")[4].split("++")[4];
+  console.log("tablinfo" + tabInfo)
+  mcon = activeTab.url.split("/")[4];
+  fullTableName = mcon.split("++")[4];
+
+  // get the warehouse info
+  let vars = {
+    mcon: mcon,
+  };
+  let query = generateTableQuery(vars);
+  let { data } = await sendRequest(query);
+  warehouseName = data.getTable.warehouse.name;
+  warehouseUuid = data.getTable.warehouse.uuid;
+
+  // update the warehouse name in the form
+  let warehouseNameInput = document.getElementById("warehouse-name");
+  warehouseNameInput.value = warehouseName;
+
+  // update the warehouse UUID in the form
+  let warehouseUuidInput = document.getElementById("warehouse-uuid");
+  warehouseUuidInput.value = warehouseUuid;
+
+  // update the MCON in the form
+  let mconinput = document.getElementById("mcon");
+  mconinput.value = mcon;
+
+  // update the table name in the form
+  let tablenameinput = document.getElementById("full-table-name");
+  tablenameinput.value = fullTableName;
+});
+
+
 
 // chrome.devtools.network.onNavigated.addListener(() => {
 //   console.log("Inspected page reloaded");
