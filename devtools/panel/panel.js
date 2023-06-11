@@ -1,29 +1,12 @@
 import {
-  getActiveTabUrl,
   generateCreateMaintenanceQuery,
   generateUsersQuery,
   generateTableQuery,
   generateDeleteMaintenanceQuery,
-} from "../../utils/utils.js";
+} from "../../tools/queries.js";
+import { getActiveTabUrl, sendRequest } from "../../tools/utils.js";
+import config from "../../config/config.js";
 
-const apiUrl = "https://graphql.getmontecarlo.com/graphql";
-
-let mcon = "";
-let fullTableName = "";
-let warehouseName = "";
-let warehouseUuid = "";
-
-async function sendRequest(query) {
-  let request = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: query,
-  };
-  let resp = await fetch(apiUrl, request);
-  return await resp.json();
-}
 
 const onCreateMaintWindow = async (e) => {
   e.preventDefault();
@@ -33,12 +16,12 @@ const onCreateMaintWindow = async (e) => {
   let queryVars = {
     startTime: startTime,
     endTime: endTime,
-    mcon: mcon,
-    dwid: warehouseUuid,
+    mcon: config.mcon,
+    dwid: config.account.warehouseUuid,
   };
 
   let query = generateCreateMaintenanceQuery(queryVars);
-  let { data } = await sendRequest(query);
+  let { data } = await sendRequest(config.apiUrl, query);
   let maintId = data.createOrUpdateDataMaintenanceEntry.entry.id;
 
   document.getElementById(
@@ -60,8 +43,7 @@ const onDeleteMaintWindow = async (e) => {
   };
 
   let query = generateDeleteMaintenanceQuery(queryVars);
-  let { data } = await sendRequest(query);
-  console.log(data);
+  let { data } = await sendRequest(config.apiUrl, query);
 
   document.getElementById(
     "deleted-maintenance-window-conf"
@@ -73,35 +55,37 @@ const onDeleteMaintWindow = async (e) => {
 
 document.addEventListener("DOMContentLoaded", async () => {
   const activeTab = await getActiveTabUrl();
-  let tabInfo = activeTab.url.split("/")[4].split("++")[4];
 
-  mcon = activeTab.url.split("/")[4];
-  fullTableName = mcon.split("++")[4];
+  config.mcon = activeTab.url.split("/")[4];
+  config.fullTableName = config.mcon.split("++")[4];
 
   // get the warehouse info
   let vars = {
-    mcon: mcon,
+    mcon: config.mcon,
   };
   let query = generateTableQuery(vars);
-  let { data } = await sendRequest(query);
-  warehouseName = data.getTable.warehouse.name;
-  warehouseUuid = data.getTable.warehouse.uuid;
+  let { data } = await sendRequest(config.apiUrl, query);
+
+  config.account = {
+    warehouseName: data.getTable.warehouse.name,
+    warehouseUuid: data.getTable.warehouse.uuid,
+  };
 
   // update the warehouse name in the form
   let warehouseNameInput = document.getElementById("warehouse-name");
-  warehouseNameInput.value = warehouseName;
+  warehouseNameInput.value = config.account.warehouseName;
 
   // update the warehouse UUID in the form
   let warehouseUuidInput = document.getElementById("warehouse-uuid");
-  warehouseUuidInput.value = warehouseUuid;
+  warehouseUuidInput.value = config.account.warehouseUuid;
 
   // update the MCON in the form
   let mconinput = document.getElementById("mcon");
-  mconinput.value = mcon;
+  mconinput.value = config.mcon;
 
   // update the table name in the form
   let tablenameinput = document.getElementById("full-table-name");
-  tablenameinput.value = fullTableName;
+  tablenameinput.value = config.fullTableName;
 
   // add event listener to create button
   document
