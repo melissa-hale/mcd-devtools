@@ -10,157 +10,55 @@
   </head>
 
   <body>
-    <nav class="navbar navbar-dark bg-primary">
+    <nav class="navbar navbar-expand navbar-light bg-light">
       <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1">Monte Carlo DevTools</span>
+        <a class="navbar-brand" href="#"
+          ><img src="/assets/images/icon-32.png" alt="" width="30" height="24"
+        /></a>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" href="/" data-link>Dash</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" href="/create-maintenance-window" data-link>Create Maintenance Window</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdownMenuLink"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Actions
+              </a>
+              <ul
+                class="dropdown-menu"
+                aria-labelledby="navbarDropdownMenuLink"
+              >
+                <li>
+                  <a class="dropdown-item" href="/create-maintenance-window"
+                    data-link>Create Maintenance Window</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#"
+                    data-link>Delete Maintenance Window</a
+                  >
+                </li>
+                <li><a class="dropdown-item" href="#">Something else</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>
-    <!-- <div class="container-fluid mt-3">
-      <form id="variables" class="mt-3">
-        <div class="form-group">
-          <label for="warehouse-name">Warehouse Name</label>
-          <input
-            type="text"
-            class="form-control form-control-sm"
-            id="warehouse-name"
-            placeholder="Enter warehouse Name"
-            disabled
-          />
-        </div>
-        <div class="form-group">
-          <label for="warehouse-uuid">Warehouse UUID</label>
-          <input
-            type="text"
-            class="form-control form-control-sm"
-            id="warehouse-uuid"
-            placeholder="Enter warehouse uuid"
-            disabled
-          />
-        </div>
-        <div class="form-group">
-          <label for="full-table-name">Full Table Name</label>
-          <input
-            type="text"
-            class="form-control form-control-sm"
-            id="full-table-name"
-            placeholder="Enter Table Name"
-            disabled
-          />
-        </div>
-        <div class="form-group">
-          <label for="mcon">Mcon</label>
-          <input
-            type="text"
-            class="form-control form-control-sm"
-            id="mcon"
-            placeholder="Enter MCON"
-            disabled
-          />
-          <!-- <small id="mconHelp" class="form-text text-muted"
-            >Validate by checking the URL</small
-          > -->
-        </div>
-      </form>
-      <!-- ----- Accordion Start ------ -->
-      <div class="accordion accordion-flush mt-3" id="accordionFlushExample">
-        <h4 class="text-primary">Available Actions:</h4>
-        <!-- ----- To create a new item, copy from here... -->
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="flush-headingOne">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#flush-collapseOne"
-              aria-expanded="false"
-              aria-controls="flush-collapseOne"
-            >
-              Create New Maintenance Window
-            </button>
-          </h2>
-          <div
-            id="flush-collapseOne"
-            class="accordion-collapse collapse"
-            aria-labelledby="flush-headingOne"
-            data-bs-parent="#accordionFlushExample"
-          >
-            <form
-              id="create-maintenance-window"
-              class="mt-3 ps-3 bg-light"
-            >
-              <div class="form-group">
-                <label for="startTime">Start Time: </label>
-                <input
-                  type="datetime-local"
-                  class="form-control"
-                  id="startTime"
-                />
-              </div>
-              <div class="form-group">
-                <label for="endTime">End Time: </label>
-                <input
-                  type="datetime-local"
-                  class="form-control"
-                  id="endTime"
-                />
-              </div>
-              <button class="btn btn-primary mt-3 mb-3">Create</button>
-            </form>
-            <div class="ps-3 bg-light" id="create-maintenance-window-results" style="display: none">
-              <h5 class="mt-3 text-primary">Success</h5>
-              <p id="maint-id">Created Maintenance Window Id</p>
-            </div>
-          </div>
-        </div>
-        <!-- End copy here  -->
-        <div class="accordion-item mt-3">
-          <h2 class="accordion-header" id="flush-headingTwo">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#flush-collapseTwo"
-              aria-expanded="false"
-              aria-controls="flush-collapseTwo"
-            >
-              Delete Existing Maintenance Window
-            </button>
-          </h2>
-          <div
-            id="flush-collapseTwo"
-            class="accordion-collapse collapse"
-            aria-labelledby="flush-headingTwo"
-            data-bs-parent="#accordionFlushExample"
-          >
-            <form
-              id="delete-maintenance-window"
-              class="mt-3 ps-3 bg-light"
-            >
-              <div class="form-group">
-                <label for="maintenance-window-id"
-                  >Maintenance Window Id:
-                </label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="maintenance-window-id"
-                />
-              </div>
-              <button class="btn btn-primary mt-3 mb-3">Delete</button>
-            </form>
-            <div class="ps-3 bg-light" id="delete-maintenance-window-results" style="display: none">
-              <h5 class="mt-3 text-primary">Success</h5>
-              <p id="deleted-maintenance-window-conf">
-                Successfully deleted maintenance window id.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- ------ Accordion end ----- -->
-    </div> -->
+    <div class="container mt-3" id="app"></div>
   </body>
-  <script type="module" src="/devtools/panel/panel.js"></script>
+  <!-- <script type="module" src="/devtools/panel/js/index.js"></script> -->
+  <script type="module" src="/devtools/panel/test.js"></script>
   <script
     src="/assets/bootstrap-5.1.3-dist/js/bootstrap.bundle.min.js"
     crossorigin="anonymous"

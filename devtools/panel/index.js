@@ -5,7 +5,7 @@ import {
   generateDeleteMaintenanceQuery,
 } from "../../tools/queries.js";
 import { getActiveTabUrl, sendRequest } from "../../tools/utils.js";
-import config from "../../config/config.js";
+import config from "../../services/config.js";
 
 
 const onCreateMaintWindow = async (e) => {
