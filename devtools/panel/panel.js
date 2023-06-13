@@ -5,7 +5,7 @@ import {
 	generateDeleteMaintenanceQuery,
 } from "../../tools/queries.js";
 
-import { appendScript, getActiveTabUrl, sendRequest } from "../../tools/utils.js";
+import { getActiveTabUrl, sendRequest } from "../../tools/utils.js";
 import Config from "../../services/config.js";
 import Router from "../../services/router.js"
 
@@ -15,7 +15,6 @@ let router = new Router();
 
 const getInstanceDetails = async () => {
 	const activeTab = await getActiveTabUrl();
-	console.log(activeTab);
 	let mcon = activeTab.url.split("/")[4];
 
 	// get the warehouse info

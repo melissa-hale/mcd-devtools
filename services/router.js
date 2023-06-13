@@ -9,23 +9,29 @@ export default class Router {
     ];
   }
 
-  async getView(path="/", config) {
-    console.log(path)
-    let match = this.routes.map((route) => {
+  async getView(path, config) {
+
+    let matches = await this.routes.map((route) => {
+        console.log(route)
         return {
             route,
             isMatch: path ===route.path
         }
-    }).find((route) => {
-        route.isMatch
-    })
+    });
 
-    if (!match) {
-        match = {
-            route: this.routes[0],
-            isMatch: false
-        }
-    }
+    console.log(matches)
+
+    let match = await matches.find((route) => {
+        route.isMatch === true
+    })
+    console.log(match)
+
+    // if (!match) {
+    //     match = {
+    //         route: this.routes[0],
+    //         isMatch: false
+    //     }
+    // }
 
     return new match.route.view(config)
   }
